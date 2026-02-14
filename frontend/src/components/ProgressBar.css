@@ -1,0 +1,172 @@
+.progress-wrapper {
+    padding: 32px;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.progress-header h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.progress-title {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 2px;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Spinner */
+.progress-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
+}
+
+/* Progress bar */
+.progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-input);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.2) 50%,
+            transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+}
+
+.progress-percent {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent-tertiary);
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+/* Steps */
+.progress-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active {
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.progress-step.done {
+    opacity: 0.6;
+}
+
+.progress-step.pending {
+    opacity: 0.35;
+}
+
+/* Step indicator */
+.step-indicator {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.progress-step.pending .step-indicator {
+    background: var(--bg-input);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.progress-step.active .step-indicator {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.progress-step.done .step-indicator {
+    background: var(--success);
+    color: white;
+}
+
+.step-spinner-mini {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.step-check {
+    font-size: 0.75rem;
+}
+
+.step-number {
+    font-size: 0.75rem;
+}
+
+/* Step info */
+.step-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.step-icon {
+    font-size: 1.1rem;
+}
+
+.step-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+}

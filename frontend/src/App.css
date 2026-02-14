@@ -1,0 +1,167 @@
+/* ─── App Layout ────────────────────────────────────── */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ────────────────────────────────────────── */
+.app-header {
+  padding: 32px 0 16px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.02);
+}
+
+.logo-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.5));
+}
+
+.logo h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+/* ─── Main Content ──────────────────────────────────── */
+.app-main {
+  flex: 1;
+  padding: 40px 0;
+}
+
+/* ─── Input Section ─────────────────────────────────── */
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.generate-section {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.btn-generate {
+  padding: 16px 40px;
+  font-size: 1.1rem;
+  border-radius: var(--radius-lg);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+/* ─── Processing Section ───────────────────────────── */
+.processing-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px 0;
+}
+
+/* ─── Result Section ───────────────────────────────── */
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+/* ─── Error Banner ──────────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
+.error-banner p {
+  flex: 1;
+  color: #fca5a5;
+  font-size: 0.95rem;
+}
+
+.error-icon {
+  font-size: 1.2rem;
+}
+
+.error-close {
+  background: none;
+  border: none;
+  color: #fca5a5;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.error-close:hover {
+  opacity: 1;
+}
+
+/* ─── Footer ────────────────────────────────────────── */
+.app-footer {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+/* ─── Responsive ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .logo h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo-icon {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .btn-generate {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+}
