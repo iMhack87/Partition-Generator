@@ -27,7 +27,9 @@ npm install
 
 ## Lancement
 
-### Backend (port 5000)
+### Backend (port 5001)
+> **Note** : Le port 5001 est utilisé pour éviter les conflits avec AirPlay sur macOS.
+
 ```bash
 cd backend
 source venv/bin/activate
@@ -41,6 +43,7 @@ npm run dev
 ```
 
 Ouvrir [http://localhost:5173](http://localhost:5173) dans le navigateur.
+Le backend sera automatiquement contacté sur [http://localhost:5001](http://localhost:5001).
 
 ## Utilisation
 

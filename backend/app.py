@@ -1,11 +1,10 @@
-"""
-Partition Generator — Flask Backend
-Main application with REST API and WebSocket support.
-"""
+import eventlet
+eventlet.monkey_patch()
+
 import os
 import uuid
 import json
-import threading
+import logging
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
@@ -20,13 +19,14 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
 
-os.makedirs(TMP_DIR, exist_ok=True)
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+# Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Flask app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'partition-generator-secret'
-CORS(app, origins=['http://localhost:5173', 'http://127.0.0.1:5173'])
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
 
 # In-memory job store
@@ -78,25 +78,27 @@ def start_transcription():
         'duration': 0,
     }
 
-    # Run pipeline in background thread
-    thread = threading.Thread(target=run_pipeline, args=(job_id,))
-    thread.daemon = True
-    thread.start()
+    logger.info(f"Starting job {job_id} for URL: {youtube_url}")
+
+    # Run pipeline in background task
+    socketio.start_background_task(run_pipeline, job_id)
 
     return jsonify({'job_id': job_id}), 202
 
 
 def run_pipeline(job_id: str):
     """Run the full transcription pipeline for a job."""
+    logger.info(f"Entering run_pipeline for job {job_id}")
     job = jobs[job_id]
     job_dir = os.path.join(TMP_DIR, job_id)
 
     try:
         # Step 1: Download audio
+        logger.info(f"[{job_id}] Downloading audio...")
         job['status'] = 'processing'
         job['step'] = 'downloading'
         job['progress'] = 10
-        socketio.emit('job_update', job, namespace='/')
+        socketio.emit('job_update', job)
 
         audio_result = extract_audio(job['url'], job_dir)
         job['title'] = audio_result['title']
@@ -104,12 +106,14 @@ def run_pipeline(job_id: str):
         job['duration'] = audio_result['duration']
         job['progress'] = 30
         job['step'] = 'downloaded'
-        socketio.emit('job_update', job, namespace='/')
+        logger.info(f"[{job_id}] Downloaded: {job['title']}")
+        socketio.emit('job_update', job)
 
         # Step 2: Transcribe to MIDI
+        logger.info(f"[{job_id}] Transcribing audio...")
         job['step'] = 'transcribing'
         job['progress'] = 40
-        socketio.emit('job_update', job, namespace='/')
+        socketio.emit('job_update', job)
 
         transcription = transcribe_audio(
             audio_result['audio_path'],
@@ -119,12 +123,14 @@ def run_pipeline(job_id: str):
         job['note_events'] = transcription['note_events']
         job['progress'] = 70
         job['step'] = 'transcribed'
-        socketio.emit('job_update', job, namespace='/')
+        logger.info(f"[{job_id}] Transcribed {len(job['note_events'])} notes.")
+        socketio.emit('job_update', job)
 
         # Step 3: Generate sheet music
+        logger.info(f"[{job_id}] Generating sheet music...")
         job['step'] = 'generating'
         job['progress'] = 80
-        socketio.emit('job_update', job, namespace='/')
+        socketio.emit('job_update', job)
 
         output_dir = os.path.join(OUTPUT_DIR, job_id)
         sheet = generate_lilypond(
@@ -137,13 +143,15 @@ def run_pipeline(job_id: str):
         job['progress'] = 100
         job['step'] = 'complete'
         job['status'] = 'complete'
-        socketio.emit('job_update', job, namespace='/')
+        logger.info(f"[{job_id}] Pipeline complete.")
+        socketio.emit('job_update', job)
 
     except Exception as e:
+        logger.error(f"[{job_id}] Error in pipeline: {str(e)}")
         job['status'] = 'error'
         job['step'] = 'error'
         job['error'] = str(e)
-        socketio.emit('job_update', job, namespace='/')
+        socketio.emit('job_update', job)
 
 
 @app.route('/api/status/<job_id>', methods=['GET'])
