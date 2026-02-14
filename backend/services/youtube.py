@@ -29,6 +29,7 @@ def extract_audio(youtube_url: str, output_dir: str) -> dict:
         'noplaylist': True,
         'quiet': True,
         'no_warnings': True,
+        'ffmpeg_location': '/opt/homebrew/bin',
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
