@@ -23,11 +23,25 @@ OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Handle numpy types in JSON (basic-pitch returns int64)
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
+                            np.int16, np.int32, np.int64, np.uint8,
+                            np.uint16, np.uint32, np.uint64)):
+            return int(obj)
+        elif isinstance(obj, (np.float_, np.float16, np.float32, np.float64)):
+            return float(obj)
+        elif isinstance(obj, (np.ndarray,)):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+import numpy as np
 # Flask app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'partition-generator-secret'
 CORS(app, resources={r"/api/*": {"origins": "*"}})
-socketio = SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins='*', async_mode='eventlet', json=NumpyEncoder)
 
 # In-memory job store
 jobs = {}
@@ -50,6 +64,11 @@ def get_instruments():
         {'id': 'trompette', 'name': 'Trompette', 'icon': '🎺'},
     ]
     return jsonify(instruments)
+
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok', 'jobs_count': len(jobs)})
 
 
 @app.route('/api/transcribe', methods=['POST'])
@@ -89,6 +108,7 @@ def start_transcription():
 def run_pipeline(job_id: str):
     """Run the full transcription pipeline for a job."""
     logger.info(f"Entering run_pipeline for job {job_id}")
+    socketio.sleep(1)  # Give client time to connect
     job = jobs[job_id]
     job_dir = os.path.join(TMP_DIR, job_id)
 

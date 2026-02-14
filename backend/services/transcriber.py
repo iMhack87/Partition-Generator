@@ -80,11 +80,11 @@ def transcribe_audio(audio_path: str, instrument: str, output_dir: str) -> dict:
     note_events_list = []
     for note in inst.notes:
         note_events_list.append({
-            'start': round(note.start, 3),
-            'end': round(note.end, 3),
-            'pitch': note.pitch,
-            'velocity': note.velocity,
-            'name': pretty_midi.note_number_to_name(note.pitch),
+            'start': float(round(note.start, 3)),
+            'end': float(round(note.end, 3)),
+            'pitch': int(note.pitch),
+            'velocity': int(note.velocity),
+            'name': str(pretty_midi.note_number_to_name(note.pitch)),
         })
 
     note_events_list.sort(key=lambda n: n['start'])

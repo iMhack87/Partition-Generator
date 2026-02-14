@@ -22,23 +22,31 @@ function App() {
   useEffect(() => {
     socket.connect()
 
-    socket.on('job_update', (data) => {
-      if (data.id === jobId || !jobId) {
-        setJobStatus(data)
-        if (data.status === 'complete') {
-          setStep('result')
-        }
-        if (data.status === 'error') {
-          setError(data.error)
-        }
+    const onJobUpdate = (data) => {
+      console.log('Job Update received:', data)
+      setJobStatus(data)
+      if (data.status === 'complete') {
+        setStep('result')
       }
-    })
+      if (data.status === 'error') {
+        setError(data.error)
+      }
+    }
+
+    const onConnect = () => console.log('Socket connected')
+    const onDisconnect = () => console.log('Socket disconnected')
+
+    socket.on('job_update', onJobUpdate)
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('job_update')
+      socket.off('job_update', onJobUpdate)
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
       socket.disconnect()
     }
-  }, [jobId])
+  }, []) // Remove jobId dependency to maintain connection
 
   const handleGenerate = useCallback(async () => {
     setError(null)
